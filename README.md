@@ -1,3 +1,17 @@
+# Running Cityscapes in Docker
+This fork provides a docker containerization, though only for running Cityscapes inference. To begin, download the trained models from the "Trained Models and CKPT" section below.
+To set up, build the docker image:
+```bash
+$ cd ~/git/DecoupleSegNets/
+$ docker build -t decouple-seg-nets-semantic-segmentation -f Dockerfile .
+```
+The following command will start the image and run the system. Be sure to update the snapshot path, input folder, and output folder for your system.
+```bash
+$ cd ~/git/DecoupleSegNets/
+$ nvidia-docker run --ipc=host -v "$(pwd):$(pwd)" --user "$(id -u):$(id -g)" decouple-seg-nets-semantic-segmentation bash -c "cd $(pwd) && python demo/demo_folder_decouple.py --demo_folder ./input_imgs --snapshot ./checkpoints/GFFNet_wider_resnet.pth --save_dir ./output_images --arch network.gffnets.DeepWV3PlusGFFNet"
+```
+
+
 ## (New) DecoupleSegNets are supported by the [PaddleSeg](https://github.com/PaddlePaddle/PaddleSeg) which has better results !!! Thanks for their work!!!
 
 
