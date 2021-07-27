@@ -3,7 +3,8 @@ Custom Norm wrappers to enable sync BN, regular BN and for weight initialization
 """
 import torch.nn as nn
 from config import cfg
-
+import sys
+sys.path.append('../apex/')
 from apex import amp
 
 

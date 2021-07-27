@@ -3,10 +3,11 @@ Dataset setup and loaders
 This file including the different datasets processing pipelines
 """
 from datasets import cityscapes
-from datasets import mapillary
-from datasets import kitti
-from datasets import camvid
-from datasets import bdd
+# # Do not load the other datasets because we are only using cityscapes and do not have these installed
+# from datasets import mapillary
+# from datasets import kitti
+# from datasets import camvid
+# from datasets import bdd
 
 import torchvision.transforms as standard_transforms
 

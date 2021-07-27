@@ -12,6 +12,11 @@ import torch
 from torch.backends import cudnn
 import torchvision.transforms as transforms
 
+import sys
+
+sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
 import network
 from optimizer import restore_snapshot
 from datasets import cityscapes
@@ -65,33 +70,17 @@ for img_id, img_name in enumerate(images):
 
     # predict
     with torch.no_grad():
-        pred, edge, body = net(x=img_tensor.unsqueeze(0).cuda(), img_num=img_id)
+        # pred, edge, body = net(img_tensor.unsqueeze(0).cuda(), img_id)
+        pred = net(img_tensor.unsqueeze(0).cuda(), img_id)
         logging.info('%04d/%04d: Inference done.' % (img_id + 1, len(images)))
 
     # final mask
     pred = pred.cpu().numpy().squeeze()
     pred = np.argmax(pred, axis=0)
 
-
-    # body mask
-    body = body.cpu().numpy().squeeze()
-    body = np.argmax(body, axis=0)
-
-    # edge map
-    edge = edge.cpu().numpy().squeeze()
-    edge_mask = np.zeros(edge.shape)
-    edge_mask[edge >= 0.8] = 255
-
     # final mask
     color_name = 'color_mask_' + img_name
     overlap_name = 'overlap_' + img_name
-
-    # body mask
-    body_color_name = 'body_mask_' + img_name
-    body_overlap_name = 'body_overlap_' + img_name
-
-    # edge mask
-    edge_mask_name = "edge_mask_" + img_name
 
     # save colorized predictions
     colorized = args.dataset_cls.colorize_mask(pred)
@@ -102,15 +91,15 @@ for img_id, img_name in enumerate(images):
     cv2.imwrite(os.path.join(args.save_dir, overlap_name), overlap[:, :, ::-1])
 
     # save colorized body predictions
-    colorized_body = args.dataset_cls.colorize_mask(body)
-    colorized_body.save(os.path.join(args.save_dir, color_name))
-
-    # save colorized body predictions overlapped on original images
-    overlap = cv2.addWeighted(np.array(img), 0.5, np.array(colorized_body.convert('RGB')), 0.5, 0)
-    cv2.imwrite(os.path.join(args.save_dir, body_overlap_name), overlap[:, :, ::-1])
-
-    # save edge map
-    cv2.imwrite(os.path.join(args.save_dir, edge_mask_name), edge_mask)
+    # colorized_body = args.dataset_cls.colorize_mask(body)
+    # colorized_body.save(os.path.join(args.save_dir, color_name))
+    #
+    # # save colorized body predictions overlapped on original images
+    # overlap = cv2.addWeighted(np.array(img), 0.5, np.array(colorized_body.convert('RGB')), 0.5, 0)
+    # cv2.imwrite(os.path.join(args.save_dir, body_overlap_name), overlap[:, :, ::-1])
+    #
+    # # save edge map
+    # cv2.imwrite(os.path.join(args.save_dir, edge_mask_name), edge_mask)
 
 
 end_time = time.time()
