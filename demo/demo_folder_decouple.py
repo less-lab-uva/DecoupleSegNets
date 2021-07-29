@@ -28,6 +28,7 @@ parser.add_argument('--demo_folder', type=str, default='', help='path to the fol
 parser.add_argument('--snapshot', type=str, default='./pretrained_models/cityscapes_best.pth', help='pre-trained checkpoint')
 parser.add_argument('--arch', type=str, default='network.deepv3.DeepWV3Plus', help='network architecture used for inference')
 parser.add_argument('--save_dir', type=str, default='./save', help='path to save your results')
+parser.add_argument('--color-mask-only', action='store_true', help='only save the color mask')
 args = parser.parse_args()
 assert_and_infer_cfg(args, train_mode=False)
 cudnn.benchmark = False
@@ -85,21 +86,10 @@ for img_id, img_name in enumerate(images):
     # save colorized predictions
     colorized = args.dataset_cls.colorize_mask(pred)
     colorized.save(os.path.join(args.save_dir, color_name))
-
-    # save colorized predictions overlapped on original images
-    overlap = cv2.addWeighted(np.array(img), 0.5, np.array(colorized.convert('RGB')), 0.5, 0)
-    cv2.imwrite(os.path.join(args.save_dir, overlap_name), overlap[:, :, ::-1])
-
-    # save colorized body predictions
-    # colorized_body = args.dataset_cls.colorize_mask(body)
-    # colorized_body.save(os.path.join(args.save_dir, color_name))
-    #
-    # # save colorized body predictions overlapped on original images
-    # overlap = cv2.addWeighted(np.array(img), 0.5, np.array(colorized_body.convert('RGB')), 0.5, 0)
-    # cv2.imwrite(os.path.join(args.save_dir, body_overlap_name), overlap[:, :, ::-1])
-    #
-    # # save edge map
-    # cv2.imwrite(os.path.join(args.save_dir, edge_mask_name), edge_mask)
+    if not args.color_mask_only:
+        # save colorized predictions overlapped on original images
+        overlap = cv2.addWeighted(np.array(img), 0.5, np.array(colorized.convert('RGB')), 0.5, 0)
+        cv2.imwrite(os.path.join(args.save_dir, overlap_name), overlap[:, :, ::-1])
 
 
 end_time = time.time()
